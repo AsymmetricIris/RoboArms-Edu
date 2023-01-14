@@ -1,5 +1,5 @@
 # RoboArms-Edu
-A software repo for controlling, simulating, visualising robot arms and generating practice problems for robot kinematics educational projects. 
+Controlling, simulating, visualising robot arms and generating practice problems for robot kinematics education 
 
 ## Aims include... ##
 * using C/C++, Python, Rust, Julia to represent traditional, modern &amp; up-and-coming languages; 
