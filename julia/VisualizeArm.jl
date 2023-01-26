@@ -2,11 +2,16 @@
 
 using LibSerialPort
 
+# var:float64 = [4, 4]
+# var ./= 2
+# println(var)
+
 println("Ports: ")
 println(list_ports())
 
 # Modify these as needed
-portname = "/dev/ttyUSB0"
+# portname = "/dev/ttyUSB0"
+portname = "COM6"
 baudrate = 115200
 
 # Snippet from examples/mwe.jl
