@@ -1,7 +1,3 @@
-# based on code from https://github.com/JuliaIO/LibSerialPort.jl
-
-using LibSerialPort
-
 using CImGui
 using CImGui.CSyntax
 using CImGui.CSyntax.CStatic
@@ -59,40 +55,63 @@ ImGuiGLFWBackend.init(glfw_ctx)
 opengl_ctx = ImGuiOpenGLBackend.create_context(glsl_version)
 ImGuiOpenGLBackend.init(opengl_ctx)
 
-# var:float64 = [4, 4]
-# var ./= 2
-# println(var)
 
-println("Ports: ")
-println(list_ports())
+#do stuff
 
-# Modify these as needed
-# portname = "/dev/ttyUSB0"
-portname = "COM8"
-baudrate = 115200
+angles::Matrix{Float32} = [0 0 0 0 0 0]
+num_joints::Int16 = 4
 
 try
-    # show a simple window that we create ourselves.
-    # we use a Begin/End pair to created a named window.
-    @cstatic f=Cfloat(0.0) b=Cfloat(0.0) c=Cfloat(0.0) counter=Cint(0) begin
-        CImGui.Begin("Hello, world!")  # create a window called "Hello, world!" and append into it.
-        CImGui.Text("This is some useful text.")  # display some text
-        @c CImGui.Checkbox("Demo Window", &show_demo_window)  # edit bools storing our window open/close state
-        @c CImGui.Checkbox("Another Window", &show_another_window)
+    clear_color = Cfloat[0.35, 0.75, 0.50, 1.00]
+    @cstatic begin
+        while glfwWindowShouldClose(window) == 0
+            glfwPollEvents()
+            # start the Dear ImGui frame
+            ImGuiOpenGLBackend.new_frame(opengl_ctx) #ImGui_ImplOpenGL3_NewFrame()
+            ImGuiGLFWBackend.new_frame(glfw_ctx) #ImGui_ImplGlfw_NewFrame()
+            CImGui.NewFrame()
 
-        @c CImGui.SliderFloat("Joint 1", &f, 0, 180)  # edit 1 float using a slider from 0 to 1
-        @c CImGui.SliderFloat("Joint 2", &b, 0, 180)  # edit 1 float using a slider from 0 to 1
-        @c CImGui.SliderFloat("Joint 3", &c, 0, 180)  # edit 1 float using a slider from 0 to 1
-        CImGui.ColorEdit3("clear color", clear_color)  # edit 3 floats representing a color
-        CImGui.Button("Button") && (counter += 1)
+            # show the big demo window
+            # show_demo_window && @c CImGui.ShowDemoWindow(&show_demo_window)
 
-        CImGui.SameLine()
-        CImGui.Text("counter = $counter")
-        CImGui.Text(@sprintf("Application average %.3f ms/frame (%.1f FPS)", 1000 / unsafe_load(CImGui.GetIO().Framerate), unsafe_load(CImGui.GetIO().Framerate)))
+            # show a simple window that we create ourselves.
+            # we use a Begin/End pair to created a named window.
+            CImGui.Begin("Joint angles")
+            CImGui.Text("Each joint rotates between 0 and 180 degrees from its starting position")
+            
+            for i = 1:num_joints
+                slider_name = "Joints " * string(i)
+                @c CImGui.SliderFloat(slider_name, &angles[i], 0, 180)
+                print(i)
+            end
+            print(' ')
 
-        println(b)
+            CImGui.End()
+            
+            print("Angles: ")
+            for i = 1:(num_joints-1)
+                print(angles[i + 1])
+                print(',')
+            end
+            print(string(angles[num_joints + 1]) * '\n')
 
-        CImGui.End()
+            # rendering
+            CImGui.Render()
+            glfwMakeContextCurrent(window)
+
+            width, height = Ref{Cint}(), Ref{Cint}() #! need helper fcn
+            glfwGetFramebufferSize(window, width, height)
+            display_w = width[]
+            display_h = height[]
+            
+            glViewport(0, 0, display_w, display_h)
+            glClearColor(clear_color...)
+            glClear(GL_COLOR_BUFFER_BIT)
+            ImGuiOpenGLBackend.render(opengl_ctx) #ImGui_ImplOpenGL3_RenderDrawData(CImGui.GetDrawData())
+
+            glfwMakeContextCurrent(window)
+            glfwSwapBuffers(window)
+        end
     end
 catch e
     @error "Error in renderloop!" exception=e
@@ -102,23 +121,4 @@ finally
     ImGuiGLFWBackend.shutdown(glfw_ctx) #ImGui_ImplGlfw_Shutdown()
     CImGui.DestroyContext(ctx)
     glfwDestroyWindow(window)
-end
-
-# Snippet from examples/mwe.jl
-LibSerialPort.open(portname, baudrate) do serial_port
-	sleep(2)
-
-	if bytesavailable(serial_port) > 0
-    	println(String(read(serial_port)))
-	end
-
-    write(serial_port, " 45,140,175,90,0,45\n")
-    sleep(1)
-    println(readline(serial_port))
-    sleep(1)
-    write(serial_port, " 180,140,175,90,25,15\n")
-    sleep(1)
-    println(readline(serial_port))
-    sleep(1)
-    println("Done")
 end
