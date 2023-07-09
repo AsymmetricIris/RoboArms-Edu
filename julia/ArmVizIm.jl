@@ -57,12 +57,33 @@ ImGuiOpenGLBackend.init(opengl_ctx)
 
 
 #do stuff
+mutable struct RJoint
+    angle::Real         #theta : angle about prev z from x_old to x_new
+    extension::Real     #'d' : offset along prev z to common normal
+    length2Next::Real   #'r' or 'a' : length of common normal
+    angle2Next::Real    #alpha : length of common normal
+end
+
+the_joint::RJoint = RJoint(0, 0, 0, 0)
+
+joints = [
+    RJoint(0, 0, 0, 0) 
+    RJoint(0, 0, 4, 90)
+    RJoint(0, 15, 0, 90) 
+    RJoint(0, 0, 0, 0) 
+    RJoint(0, 0, 0, 0)
+    RJoint(0, 0, 0, 0)
+]
 
 angles::Matrix{Float32} = [0 0 0 0 0 0]
-num_joints::Int16 = 4
+num_joints::Int16 = 5
 
 try
     clear_color = Cfloat[0.35, 0.75, 0.50, 1.00]
+    joints[1].angle = 15
+    joints[num_joints].angle = 45
+    println(joints[1])
+    println(joints[num_joints])
     @cstatic begin
         while glfwWindowShouldClose(window) == 0
             glfwPollEvents()
@@ -79,10 +100,49 @@ try
             CImGui.Begin("Joint angles")
             CImGui.Text("Each joint rotates between 0 and 180 degrees from its starting position")
             
-            for i = 1:num_joints
+            CImGui.Text('θ' * ' ' * 'd' * ' ' * 'r' * ' ' * 'a' * ' ')
+
+            # for i = 1:(num_joints + 1)
+            #     text = string(joints[i].angle) * ' ' * string(joints[i].extension) * ' '
+            #     text = text * string(joints[i].angle2Next) * ' '
+            #     text = text * string(joints[i].length2Next) * ' '
+            #     CImGui.Text(text)
+            # end
+
+            # for i = 1:(num_joints + 1)
+                CImGui.Columns(3, "mixed")
+                CImGui.Separator()
+
+                CImGui.Text("Hello")
+                CImGui.Button("Banana")
+                CImGui.NextColumn()
+
+                CImGui.Text("ImGui")
+                CImGui.Button("Apple")
+                @cstatic foo=Cfloat(1.0) @c CImGui.InputFloat("red", &foo, 0.05, 0, "%.3f")
+                CImGui.Text("An extra line here.")
+                CImGui.NextColumn()
+
+                CImGui.Text("Sailor")
+                CImGui.Button("Corniflower")
+                @cstatic bar=Cfloat(1.0) @c CImGui.InputFloat("blue", &bar, 0.05, 0, "%.3f")
+                CImGui.NextColumn()
+
+                CImGui.CollapsingHeader("Category A") && CImGui.Text("Blah blah blah")
+                CImGui.NextColumn()
+                CImGui.CollapsingHeader("Category B") && CImGui.Text("Blah blah blah")
+                CImGui.NextColumn()
+                CImGui.CollapsingHeader("Category C") && CImGui.Text("Blah blah blah")
+                CImGui.NextColumn()
+                CImGui.Columns(1)
+                CImGui.Separator()
+            # end
+
+            for i = 1:(num_joints + 1)
                 slider_name = "Joints " * string(i)
                 @c CImGui.SliderFloat(slider_name, &angles[i], 0, 180)
-                print(i)
+                joints[i].angle = angles[i]
+                print(string(i))
             end
             print(' ')
 
@@ -90,10 +150,12 @@ try
             
             print("Angles: ")
             for i = 1:(num_joints-1)
-                print(angles[i + 1])
+                # print(angles[i + 1])
+                print(joints[i + 1].angle)
                 print(',')
             end
-            print(string(angles[num_joints + 1]) * '\n')
+            # print(string(angles[num_joints + 1]) * '\n')
+            print(string(joints[num_joints + 1].angle) * '\n')
 
             # rendering
             CImGui.Render()
