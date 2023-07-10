@@ -18,30 +18,30 @@ end
 
 joints = [
     RJoint(0, 0, 0, 0) 
-    RJoint(0, 0, 4, 90)
-    RJoint(0, 15, 0, 90) 
-    RJoint(0, 0, 0, 0) 
-    RJoint(0, 0, 0, 0)
-    RJoint(0, 0, 0, 0)
+    RJoint(135, 0, 4, 90)
+    RJoint(180, 15, 0, 90) 
+    RJoint(90, 0, 0, 0) 
+    RJoint(45, 0, 0, 0)
+    RJoint(15, 0, 0, 0)
 ]
 
 println("Ports: ")
-println(list_ports())
+list_ports()
 
 # Modify these as needed
 # portname = "/dev/ttyUSB0"
-portname = "COM8"
+portname = "COM4"
 baudrate = 115200
 
 qml_file = joinpath(dirname(@__FILE__), "qml", "observable.qml")
 
-const input = Observable(90.0)
+const input = Observable(15.0)
 const output = Observable(0.0)
 const num_joints = Observable(size(joints)[1])
-const joint_selected_ui = Observable(2)
-joint_selected::Int32 = 2
+const joint_selected_ui = Observable(6)
+# joint_selected = 2
 
-robot = Robot(2)
+robot = Robot(6)
 
 on(joint_selected_ui) do y
   # joint_selected = trunc(Int64, y)
@@ -62,19 +62,17 @@ on(output) do x
   
   print(ctrl_string)
 
-  # # Snippet from examples/mwe.jl
-  # LibSerialPort.open(portname, baudrate) do serial_port
-  # 	sleep(2)
+  # Snippet from examples/mwe.jl
+  LibSerialPort.open(portname, baudrate) do serial_port
+    # I'm sorry....
+  	sleep(2)  # I forgot why the gui doesn't appear at (1). This is not a magic number 
 
-  # 	if bytesavailable(serial_port) > 0
-  #     	println(String(read(serial_port)))
-  # 	end
+    write(serial_port, ctrl_string)
+    # sleep(1)
 
-  #   write(serial_port, ctrl_string)
-  #   sleep(1)
-  #   println(readline(serial_port))
-  #   sleep(1)
-  # end
+    println(readline(serial_port))
+    # sleep(1)
+  end
 end
 
 loadqml(qml_file, observables = JuliaPropertyMap("input" => input, "output" => output, "num_joints" => num_joints, "joint_selected" => joint_selected_ui))
@@ -85,23 +83,6 @@ else
   exec()
 end
 
-
-
-# # Snippet from examples/mwe.jl
-# LibSerialPort.open(portname, baudrate) do serial_port
-# 	sleep(2)
-
-# 	if bytesavailable(serial_port) > 0
-#     	println(String(read(serial_port)))
-# 	end
-
-#   write(serial_port, " 45,140,175,90,0,45\n")
-#   sleep(1)
-#   println(readline(serial_port))
-#   sleep(1)
-#   write(serial_port, " 180,140,175,90,25,15\n")
-#   sleep(1)
-#   println(readline(serial_port))
-#   sleep(1)
-#   println("Done")
-# end
+if bytesavailable(serial_port) > 0
+  	println(String(read(serial_port)))
+end
