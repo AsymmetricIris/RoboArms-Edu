@@ -17,7 +17,7 @@ ApplicationWindow {
 
     Repeater {
             id: repeater
-            model: 2
+            model: observables.num_joints
             RowLayout {
                 Slider {
                     id: slider
@@ -28,6 +28,7 @@ ApplicationWindow {
                     wheelEnabled: false
                     minimumValue: 0.0
                     maximumValue: 180.0
+                    stepSize: 1 //0.25
                     value: 90
                     onValueChanged: {
                         Julia.changeAngleQml(index + 1, value);

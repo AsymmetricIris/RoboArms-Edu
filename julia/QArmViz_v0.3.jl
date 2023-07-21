@@ -12,10 +12,6 @@ mutable struct RJoint
     angle2Next::Real    #alpha : length of common normal
 end
 
-mutable struct Robot
-  joint_selected::Int32
-end
-
 joints = [
     RJoint(0, 0, 0, 0) 
     RJoint(0, 0, 4, 90)
@@ -24,6 +20,10 @@ joints = [
     RJoint(0, 0, 0, 0)
     RJoint(0, 0, 0, 0)
 ]
+
+for idx = 1:size(joints)[1]
+    joints[idx].angle = 90
+end
 
 println("Ports: ")
 println(list_ports())
@@ -36,8 +36,7 @@ baudrate = 115200
 qml_file = joinpath(dirname(@__FILE__), "qml", "ctrl.qml")
 
 joint_count = size(joints)[1]
-
-robot = Robot(2)
+observe_joints = Observable(joint_count)
 
 function printqml(number)
   println(number)
@@ -50,14 +49,24 @@ end
 @qmlfunction changeAngleQml
 
 function showAnglesQml()
-  print("[ ")
+    ctrl_string = ""
 
-  for idx = 1:joint_count
-    print(joints[idx].angle)
-    print(" ")
-  end
+    for idx = 1:joint_count
+        ctrl_string *= string(joints[idx].angle)
+        ctrl_string *= ","
+    end
 
-  println("]")
+    ctrl_string = ctrl_string * "end"
+    ctrl_string = replace(ctrl_string, ",end" => "\n")
+
+    print(ctrl_string)
+
+#   for idx = 1:joint_count
+#     print(joints[idx].angle)
+#     print(" ")
+#   end
+
+#   println("]")
 end
 @qmlfunction showAnglesQml
 
@@ -66,7 +75,7 @@ function truncQml(number)
 end
 @qmlfunction truncQml
 
-loadqml(qml_file)
+loadqml(qml_file, observables = JuliaPropertyMap("num_joints" => observe_joints))
 
 if isinteractive()
   exec_async()
