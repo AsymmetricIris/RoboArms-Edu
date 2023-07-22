@@ -29,7 +29,7 @@ ApplicationWindow {
                     minimumValue: 0.0
                     maximumValue: 180.0
                     stepSize: 1 //0.25
-                    value: 90
+                    value: observables.default_angles[index]
                     onValueChanged: {
                         Julia.changeAngleQml(index + 1, value);
                         Julia.showAnglesQml();

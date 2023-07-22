@@ -21,8 +21,10 @@ joints = [
     RJoint(0, 0, 0, 0)
 ]
 
+default_angles = Observable([ 45, 140, 175, 90, 0, 45 ])
+
 for idx = 1:size(joints)[1]
-    joints[idx].angle = 90
+    joints[idx].angle = default_angles[][idx]
 end
 
 println("Ports: ")
@@ -32,8 +34,6 @@ println(list_ports())
 # portname = "/dev/ttyUSB0"
 portname = "COM8"
 baudrate = 115200
-
-qml_file = joinpath(dirname(@__FILE__), "qml", "ctrl.qml")
 
 joint_count = size(joints)[1]
 observe_joints = Observable(joint_count)
@@ -75,7 +75,8 @@ function truncQml(number)
 end
 @qmlfunction truncQml
 
-loadqml(qml_file, observables = JuliaPropertyMap("num_joints" => observe_joints))
+qml_file = joinpath(dirname(@__FILE__), "qml", "ctrl_v0.3.qml")
+loadqml(qml_file, observables = JuliaPropertyMap("num_joints" => observe_joints, "default_angles" => default_angles))
 
 if isinteractive()
   exec_async()
