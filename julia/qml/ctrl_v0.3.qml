@@ -32,7 +32,7 @@ ApplicationWindow {
                     value: observables.default_angles[index]
                     onValueChanged: {
                         Julia.changeAngleQml(index + 1, value);
-                        Julia.showAnglesQml();
+                        Julia.jointCtrlQml();
                     }
                 }
 

@@ -21,7 +21,7 @@ joints = [
     RJoint(0, 0, 0, 0)
 ]
 
-default_angles = Observable([ 45, 140, 175, 90, 0, 45 ])
+default_angles = Observable([ 45, 140, 175, 90, 45, 40 ])
 
 for idx = 1:size(joints)[1]
     joints[idx].angle = default_angles[][idx]
@@ -32,7 +32,7 @@ println(list_ports())
 
 # Modify these as needed
 # portname = "/dev/ttyUSB0"
-portname = "COM8"
+portname = "COM13"
 baudrate = 115200
 
 joint_count = size(joints)[1]
@@ -48,8 +48,10 @@ function changeAngleQml(angle_idx, angle)
 end
 @qmlfunction changeAngleQml
 
-function showAnglesQml()
-    ctrl_string = ""
+# TODO -  remove several repetitions of angle printing 
+#         before ctrl gui shows
+function jointCtrlQml()
+    ctrl_string = " "
 
     for idx = 1:joint_count
         ctrl_string *= string(joints[idx].angle)
@@ -59,16 +61,17 @@ function showAnglesQml()
     ctrl_string = ctrl_string * "end"
     ctrl_string = replace(ctrl_string, ",end" => "\n")
 
-    print(ctrl_string)
-
-#   for idx = 1:joint_count
-#     print(joints[idx].angle)
-#     print(" ")
-#   end
-
-#   println("]")
+    # TODO - improve response speed
+    LibSerialPort.open(portname, baudrate) do serial_port
+      sleep(1)
+      
+      write(serial_port, ctrl_string)
+      sleep(0.1)
+      println(readline(serial_port))
+      sleep(0.1)
+    end
 end
-@qmlfunction showAnglesQml
+@qmlfunction jointCtrlQml
 
 function truncQml(number)
   return trunc(Int32, number)
@@ -76,6 +79,7 @@ end
 @qmlfunction truncQml
 
 qml_file = joinpath(dirname(@__FILE__), "qml", "ctrl_v0.3.qml")
+# TODO - set min/max joint angles
 loadqml(qml_file, observables = JuliaPropertyMap("num_joints" => observe_joints, "default_angles" => default_angles))
 
 if isinteractive()
