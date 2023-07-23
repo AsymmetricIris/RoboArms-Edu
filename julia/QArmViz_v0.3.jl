@@ -61,14 +61,20 @@ function jointCtrlQml()
     ctrl_string = ctrl_string * "end"
     ctrl_string = replace(ctrl_string, ",end" => "\n")
 
+    # print(ctrl_string)
+
     # TODO - improve response speed
     LibSerialPort.open(portname, baudrate) do serial_port
-      sleep(1)
+      sleep(2)
       
+      if bytesavailable(serial_port) > 0
+          println(String(read(serial_port)))
+      end                               
+
       write(serial_port, ctrl_string)
-      sleep(0.1)
+      sleep(1)
       println(readline(serial_port))
-      sleep(0.1)
+      sleep(1)
     end
 end
 @qmlfunction jointCtrlQml
