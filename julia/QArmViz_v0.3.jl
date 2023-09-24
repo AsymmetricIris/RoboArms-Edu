@@ -21,7 +21,7 @@ joints = [
     RJoint(0, 0, 0, 0)
 ]
 
-default_angles = Observable([ 45, 140, 175, 90, 45, 40 ])
+default_angles = Observable([ 45, 140, 175, 90, 45, 30 ])
 
 for idx = 1:size(joints)[1]
     joints[idx].angle = default_angles[][idx]
@@ -59,22 +59,23 @@ function jointCtrlQml()
     end
 
     ctrl_string = ctrl_string * "end"
-    ctrl_string = replace(ctrl_string, ",end" => "\n")
+    ctrl_string = replace(ctrl_string, "end" => "\n")
 
-    # print(ctrl_string)
+    # debug
+    print(ctrl_string)
 
     # TODO - improve response speed
     LibSerialPort.open(portname, baudrate) do serial_port
       sleep(2)
       
-      if bytesavailable(serial_port) > 0
-          println(String(read(serial_port)))
-      end                               
+      # if bytesavailable(serial_port) > 0
+      #     println(String(read(serial_port)))
+      # end                               
 
       write(serial_port, ctrl_string)
       sleep(1)
-      println(readline(serial_port))
-      sleep(1)
+      # println(readline(serial_port))
+      # sleep(1)
     end
 end
 @qmlfunction jointCtrlQml
@@ -93,17 +94,3 @@ if isinteractive()
 else
   exec()
 end
-
-# # Snippet from examples/mwe.jl
-  # LibSerialPort.open(portname, baudrate) do serial_port
-  # 	sleep(2)
-
-  # 	if bytesavailable(serial_port) > 0
-  #     	println(String(read(serial_port)))
-  # 	end
-
-  #   write(serial_port, ctrl_string)
-  #   sleep(1)
-  #   println(readline(serial_port))
-  #   sleep(1)
-  # end

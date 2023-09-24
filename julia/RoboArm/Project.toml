@@ -1,0 +1,4 @@
+name = "RoboArm"
+uuid = "5d102613-5620-4e9a-bfcf-b644aa6b7b61"
+authors = ["AsymmetricIris <42551549+AsymmetricIris@users.noreply.github.com>"]
+version = "0.1.0"

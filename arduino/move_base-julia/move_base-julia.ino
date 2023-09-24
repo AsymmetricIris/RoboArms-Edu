@@ -42,10 +42,10 @@ void loop()
     String arg_input = Serial.readStringUntil('\n');
     retrieve_angles(arg_input, joint_angles);
     
-    print_servo_angles();
+    // print_servo_angles();
 
     // TODO - bug - weird behaviour where arm moves to several random angles 
-    //              whenever write is attmepted
+    //              whenever write is attempted
     // TODO - bug - resolved random movement by moving write_angles() 
     //              into Serial.available condition
     //              Figure out why write_angles() does the wacky
@@ -60,8 +60,8 @@ void loop()
 
 //assign target angle signals to joints' servo controllers
 void write_angles()
-{
-  //int32_t i = 0; Serial.flush();
+{ 
+  Serial.flush();
   for (int idx = 0; idx < 6; idx++)
   {
     if (joint_angles[idx] >= 0)
@@ -71,7 +71,7 @@ void write_angles()
       Serial.print(",");
     }
   }
-  Serial.print(" : ");
+  Serial.println("");
 }
 
 // retrieve servo angles 

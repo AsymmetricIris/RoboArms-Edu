@@ -1,0 +1,4 @@
+name = "ArmVizBlink"
+uuid = "0d147545-caf4-45e9-9a2b-f81d3bcb5237"
+authors = ["AsymmetricIris <42551549+AsymmetricIris@users.noreply.github.com>"]
+version = "0.1.0"
