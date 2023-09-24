@@ -12,16 +12,22 @@ mutable struct RJoint
     angle2Next::Real    #alpha : length of common normal
 end
 
+# joints = [
+#     RJoint(0, 0, 0, 0) 
+#     RJoint(0, 0, 4, 90)
+#     RJoint(0, 15, 0, 90) 
+#     RJoint(0, 0, 0, 0) 
+#     RJoint(0, 0, 0, 0)
+#     RJoint(0, 0, 0, 0)
+# ]
+
 joints = [
-    RJoint(0, 0, 0, 0) 
-    RJoint(0, 0, 4, 90)
-    RJoint(0, 15, 0, 90) 
-    RJoint(0, 0, 0, 0) 
-    RJoint(0, 0, 0, 0)
-    RJoint(0, 0, 0, 0)
+    RJoint(0, 0, 0, 45) 
+    RJoint(0, 0, 4, 140)
 ]
 
-default_angles = Observable([ 45, 140, 175, 90, 45, 30 ])
+# default_angles = Observable([ 45, 140, 175, 90, 45, 30 ])
+default_angles = Observable([ 45, 140 ])
 
 for idx = 1:size(joints)[1]
     joints[idx].angle = default_angles[][idx]
