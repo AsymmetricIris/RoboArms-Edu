@@ -3,10 +3,10 @@
 
 Servo servos[] = {Servo(), Servo(), Servo(), Servo(), Servo(), Servo()};
 int8_t servo_pins[] = {4, 5, 6, 7, 8, 9};
-int8_t num_joints = 2;
+int8_t num_joints = 6;
 // initial joint angles (chosen to achieve a stable pose)
-int32_t default_angles[] = {0, 135, 180, 90, 45, 15};
-int32_t joint_angles[] = {0, 135, 180, 90, 45, 15};
+int16_t default_angles[] = {0, 135, 180, 90, 45, 15};
+int16_t joint_angles[] = {0, 135, 180, 90, 45, 15};
 
 // Use this to introduce latency in the response
 unsigned long responseDelay = 1000; // ms
@@ -41,6 +41,7 @@ void loop()
     delay(responseDelay);
 
     String arg_input = Serial.readStringUntil('\n');
+    Serial.print(arg_input + " : ");
     retrieve_angles(arg_input, joint_angles);
     
     // print_servo_angles();
@@ -63,6 +64,7 @@ void loop()
 void write_angles()
 { 
   Serial.flush();
+
   for (int idx = 0; idx < num_joints; idx++)
   {
     if (joint_angles[idx] >= 0)
@@ -77,7 +79,7 @@ void write_angles()
 
 // retrieve servo angles 
 // so they can be output to servo ctrl pins
-void retrieve_angles(String a_input, int32_t a_joint_angles[])
+void retrieve_angles(String a_input, int16_t a_joint_angles[])
 {
   int32_t prev_delim_idx = 0; // will tell us where to start collecting an arg string
   int32_t next_delim_idx = 0; // will tell us where to stop collecting an arg string
