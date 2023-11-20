@@ -1,14 +1,14 @@
 #include <Servo.h>
 
-const int BAUD = 300;
+const int BAUD = 1200;
 
 uint8_t rd_pins[] = {A0, A1, A2, A3, A4, A5, A6};
-uint8_t servo_ctrl_pins[] = {4, 5, 6, 7, 8, 0};         //TODO - make this progression linear
+uint8_t servo_ctrl_pins[] = {3, 4, 6, 7, 8, 0};         //TODO - make this progression linear
 Servo servos[] = {  Servo(), Servo(), Servo(), 
                     Servo(), Servo(), Servo()   };
 // long joint_angles[] = {0, 0, 0, 0, 0, 0};
 long joint_angles[] = {0, 140, 160, 90, 40, 10};               //will assign values to angles before we write ctrl signals
-uint8_t servo_count = 1;                              //will use 6 in later versions using the RoboArm
+uint8_t servo_count = 2;                              //will use 6 in later versions using the RoboArm
 
 void assign_pins(Servo joint_servos[], uint8_t ctrl_pins[], uint8_t pin_count, long angles[]);
 void rd_angles(uint8_t read_pins[], uint8_t pin_count, long angles[]);
@@ -18,7 +18,7 @@ void print_angles(uint8_t pin_count, long angles[]);
 // the setup routine runs once when you press reset:
 void setup() {
   // initialize serial communication at 9600 bits per second:
-  Serial.begin(300);
+  Serial.begin(BAUD);
   // assign_pins(servos, servo_ctrl_pins, servo_count, joint_angles);
   assign_pins(servos, servo_ctrl_pins, 6, joint_angles);
 }
@@ -72,6 +72,6 @@ void rd_angles(uint8_t read_pins[], uint8_t pin_count, long angles[])
   for (int8_t idx = 0; idx < pin_count; idx++)
   {
     int sensorValue = analogRead(read_pins[idx]);
-    joint_angles[idx] = map(sensorValue, 0, 1023, 0, 360);
+    joint_angles[idx] = map(sensorValue, 0, 1023, 0, 180);
   }
 }
